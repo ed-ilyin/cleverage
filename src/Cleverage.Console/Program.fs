@@ -5,31 +5,31 @@ type Role = Savior | Mason | Reptiloid | Demon
 let rnd = Random ()
 
 let players = [
-    "🍑Забава",       [ 1; 1; 1; 1 ]
-    "🤬Щегол",        [ 1; 1; 1; 1 ]
-    "👣Маркиза",      [ 1; 1; 1; 1 ]
-    "🔱Карабас",      [ 1; 1; 1; 1 ]
-    "🪵Гуманоид",     [ 1; 1; 1; 1 ]
-    "🦖Буратино",     [ 1; 1; 1; 1 ]
-    "🌈Хитрость Ума", [ 1; 1; 1; 1 ]
-    "🎃Аватар",       [ 1; 1; 1; 1 ]
-    "♟Жмых",         [ 1; 1; 1; 1 ]
-    "🍌Командор",     [ 1; 1; 1; 1 ]
+    "🍑Забава",       1, 7, 9
+    "🤬Щегол",        1, 7, 9
+    "👣Маркиза",      1, 7, 9
+    "🔱Карабас",      1, 7, 9
+    "🪵Гуманоид",     1, 7, 9
+    "🦖Буратино",     1, 7, 9
+    "🌈Хитрость Ума", 1, 7, 9
+    "🎃Аватар",       1, 7, 9
+    "♟Жмых",         1, 6, 9
+    "🍌Командор",     1, 7, 9
 ]
 
 let times = 100000
 
-let roleMapping (index, player) =
-    player
+let roleMapping (index, (name, savior, reptiloid, demon)) =
+    name
     , match index with
-        | i when i = 0 -> Savior
-        | i when i < 7 -> Mason
-        | i when i < 9 -> Reptiloid
+        | i when 0 <= i && i < mason -> Savior
+        | i when i < reptiloid -> Mason
+        | i when i < demon -> Reptiloid
         | _ -> Demon
 
 let assignRolesAsAvatar table =
     table
-    |> List.map (fun (player, weight) -> player, rnd.Next(0, 1000) + weight)
+    |> List.map (fun (player, weight) -> player, rnd.Next())
     |> List.sortBy snd |> List.map fst |> List.indexed |> List.map roleMapping
 
 let step = 100. / float times
