@@ -14,6 +14,7 @@ type Page =
     | [<EndPoint "/counter">] Counter
     | [<EndPoint "/data">] Data
     | [<EndPoint "/table">] Table
+    | [<EndPoint "/matrix">] Matrix
 
 /// The Elmish application's model.
 type Model =
@@ -200,6 +201,7 @@ let view model dispatch =
             menuItem model Counter "Counter"
             menuItem model Data "Download data"
             menuItem model Table "Table"
+            menuItem model Matrix "Матрица"
         ])
         .Body(
             cond model.page <| function
@@ -210,6 +212,7 @@ let view model dispatch =
                 | Some username -> dataPage model username dispatch
                 | None -> signInPage model dispatch
             | Table -> Table.view
+            | Matrix -> Matrix.view
         )
         .Error(
             cond model.error <| function

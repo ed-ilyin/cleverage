@@ -4,6 +4,7 @@
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Матрица.fs" />
     <Compile Include="Table.fs" />
     <Compile Include="Main.fs" />
     <Compile Include="Startup.fs" />
