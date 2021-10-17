@@ -2,11 +2,8 @@ module Cleverage.Client.Matrix
 open Bolero.Html
 open System
 
-let rnd = Random ()
-
 let initMatrix = List.replicate 10 [ 0.1; 0.6; 0.2; 0.1 ]
 
-// let x, y, v = 0, 5, 0.
 let replace x y newValue i j value = if i = y && j = x then newValue else value
 let distributeRow x y k i j value = if i = y && j = x then value else value * k
 
