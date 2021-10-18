@@ -3,14 +3,16 @@ open Bolero.Html
 open System
 
 let initMatrix = List.replicate 10 [ 0.1; 0.6; 0.2; 0.1 ]
+let rowSums = List.map List.sum
+let targetRowSums = rowSums initMatrix
 
-let matrixSum matrix =
+let colSums matrix =
     List.fold
     <| List.map2 (+)
     <| List.replicate (List.head matrix |> List.length) 0.
     <| matrix
 
-let total = matrixSum initMatrix
+let targetColSums = colSums initMatrix
 
 let replace x y newValue i j value = if i = y && j = x then newValue else value
 let distributeRow x y k i j value = if i = y && j = x then value else value * k
@@ -35,23 +37,63 @@ let distributeRows y k i row =
     printfn "%i %+A %+A" i row nr
     nr
 
-let changeMatrix x y newValue matrix =
-    let matrix = List.mapi (distribute x y newValue) matrix
-    let badSum = matrixSum matrix
-    let otherSum = zeroRow y matrix |> matrixSum
-    let k = List.map3 (fun b s o -> 1. - (b - s) / o) badSum total otherSum
-    printfn "%i %+A" y k
-    List.mapi (distributeRows y k) matrix
+let setCell x y newValue =
+    List.mapi (fun j -> List.mapi (fun i e ->
+        if i = x && j = y then newValue else e
+    ))
+
+let rec balanceRows matrix =
+    let kr = rowSums matrix |> List.map2 (/) targetRowSums
+    List.map2 (fun kr row -> List.map ((*) kr) row) kr matrix
+
+let rec balanceCols matrix =
+    let kc = colSums matrix |> List.map2 (/) targetColSums
+    List.map (List.map2 (*) kc) matrix
+
+let changeMatrix x y newValue =
+    setCell x y newValue
+    >> balanceRows >> balanceCols
+    >> balanceRows >> balanceCols
+    >> balanceRows >> balanceCols
+    >> balanceRows >> balanceCols
+    >> balanceRows >> balanceCols
+    >> balanceRows >> balanceCols
+    >> balanceRows >> balanceCols
+    >> balanceRows >> balanceCols
+    >> balanceRows >> balanceCols
+    >> balanceRows >> balanceCols
+    >> balanceRows >> balanceCols
+    >> balanceRows >> balanceCols
+    >> balanceRows >> balanceCols
+    >> balanceRows >> balanceCols
+    >> balanceRows >> balanceCols
+    >> balanceRows >> balanceCols
+    >> balanceRows >> balanceCols
+    >> balanceRows >> balanceCols
+    >> balanceRows >> balanceCols
+    >> balanceRows >> balanceCols
+    >> balanceRows >> balanceCols
+    >> balanceRows >> balanceCols
+    >> balanceRows >> balanceCols
+    >> balanceRows >> balanceCols
+    >> balanceRows >> balanceCols
+    >> balanceRows >> balanceCols
+    >> balanceRows >> balanceCols
+    >> balanceRows >> balanceCols
+
+// let changeMatrix x y newValue matrix =
+//     let matrix = List.mapi (distribute x y newValue) matrix
+//     let badSum = matrixSum matrix
+//     let otherSum = zeroRow y matrix |> matrixSum
+//     let k = List.map3 (fun b s o -> 1. - (b - s) / o) badSum total otherSum
+//     printfn "%i %+A" y k
+//     List.mapi (distributeRows y k) matrix
 
 let newMatrix =
     initMatrix
     |> changeMatrix 0 5 0.
-    |> changeMatrix 0 5 0.
-    |> changeMatrix 1 5 0.
     |> changeMatrix 1 5 0.
     |> changeMatrix 2 3 0.
-    |> changeMatrix 2 3 0.
-    |> changeMatrix 2 5 0.
     |> changeMatrix 2 5 0.
     // |> List.map (fun row -> row, List.item 2 row + List.item 3 row)
     // |> List.sortBy snd
