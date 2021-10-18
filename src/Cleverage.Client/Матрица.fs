@@ -4,6 +4,14 @@ open System
 
 let initMatrix = List.replicate 10 [ 0.1; 0.6; 0.2; 0.1 ]
 
+let matrixSum matrix =
+    List.fold
+    <| List.map2 (+)
+    <| List.replicate (List.head matrix |> List.length) 0.
+    <| matrix
+
+let total = matrixSum initMatrix
+
 let replace x y newValue i j value = if i = y && j = x then newValue else value
 let distributeRow x y k i j value = if i = y && j = x then value else value * k
 
@@ -15,12 +23,6 @@ let distribute x y newValue i row =
     let k = 1. - change / rowOtherSum
     List.mapi (distributeRow x y k i) row
 
-let matrixSum matrix =
-    List.fold
-    <| List.map2 (+)
-    <| List.replicate (List.head matrix |> List.length) 0.
-    <| matrix
-
 let zeroRow i = List.mapi (fun j row ->
     if i = j then List.replicate (List.length row) 0. else row
 )
@@ -31,11 +33,10 @@ let distributeRows y k i row =
     nr
 
 let changeMatrix x y newValue matrix =
-    let sum = matrixSum matrix
     let matrix = List.mapi (distribute x y newValue) matrix
     let badSum = matrixSum matrix
     let otherSum = zeroRow y matrix |> matrixSum
-    let k = List.map3 (fun b s o -> 1. - (b - s) / o) badSum sum otherSum
+    let k = List.map3 (fun b s o -> 1. - (b - s) / o) badSum total otherSum
     printfn "%i %+A" y k
     List.mapi (distributeRows y k) matrix
 

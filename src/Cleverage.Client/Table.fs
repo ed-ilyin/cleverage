@@ -191,8 +191,9 @@ let h = text >> List.singleton >> th []
 let view =
     table [ attr.``class`` "table" ] [
         thead [] [ h "С"; h "Имя"; h "П"; h "С"; h "М"; h "Р"; h "Д"; h "∑" ]
-        List.sortBy (fun игрок -> игрок.Подозрительность) рейтинг
+        рейтинг
         |> List.sortBy (fun игрок -> игрок.Рептилоид + игрок.Демон)
+        |> List.sortBy (fun игрок -> игрок.Подозрительность)
         |> List.map (fun игрок ->
             tr [] [
                 td [] [ text игрок.Символ ]
