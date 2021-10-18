@@ -5,18 +5,13 @@ open System
 let initMatrix = List.replicate 10 [ 0.1; 0.6; 0.2; 0.1 ]
 let rowSums = List.map List.sum
 let targetRowSums = rowSums initMatrix
-
-let colSums matrix =
-    List.fold
-    <| List.map2 (+)
-    <| List.replicate (List.head matrix |> List.length) 0.
-    <| matrix
-
+let zeroes = List.replicate (List.head initMatrix |> List.length) 0.
+let colSums = List.fold (List.map2 (+)) zeroes
 let targetColSums = colSums initMatrix
 
 let setCell x y newValue =
-    List.mapi (fun j -> List.mapi (fun i e ->
-        if i = x && j = y then newValue else e
+    List.mapi (fun j -> List.mapi (fun i value ->
+        if i = x && j = y then newValue else value
     ))
 
 let balanceRows matrix =
