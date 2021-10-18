@@ -14,80 +14,38 @@ let colSums matrix =
 
 let targetColSums = colSums initMatrix
 
-let replace x y newValue i j value = if i = y && j = x then newValue else value
-let distributeRow x y k i j value = if i = y && j = x then value else value * k
-
-let distribute x y newValue i row =
-    let newRow = List.mapi (replace x y newValue i) row
-    let rowBadSum = List.sum row
-    let rowOtherSum = List.mapi (replace x y 0. i) row |> List.sum
-    let change = rowBadSum - 1.
-    let k = 1. - change / rowOtherSum
-    let nr = List.mapi (distributeRow x y k i) newRow
-    // printfn "%i %i %f %i %+A %+A %f %f %f %f %+A"
-        // x y newValue i row newRow rowBadSum rowOtherSum change k nr
-    nr
-
-let zeroRow i = List.mapi (fun j row ->
-    if i = j then List.replicate (List.length row) 0. else row
-)
-
-let distributeRows y k i row =
-    let nr = if i = y then row else List.map2 (*) row k
-    printfn "%i %+A %+A" i row nr
-    nr
-
 let setCell x y newValue =
     List.mapi (fun j -> List.mapi (fun i e ->
         if i = x && j = y then newValue else e
     ))
 
-let rec balanceRows matrix =
+let balanceRows matrix =
     let kr = rowSums matrix |> List.map2 (/) targetRowSums
     List.map2 (fun kr row -> List.map ((*) kr) row) kr matrix
 
-let rec balanceCols matrix =
+let balanceCols matrix =
     let kc = colSums matrix |> List.map2 (/) targetColSums
     List.map (List.map2 (*) kc) matrix
 
-let changeMatrix x y newValue =
-    setCell x y newValue
-    >> balanceRows >> balanceCols
-    >> balanceRows >> balanceCols
-    >> balanceRows >> balanceCols
-    >> balanceRows >> balanceCols
-    >> balanceRows >> balanceCols
-    >> balanceRows >> balanceCols
-    >> balanceRows >> balanceCols
-    >> balanceRows >> balanceCols
-    >> balanceRows >> balanceCols
-    >> balanceRows >> balanceCols
-    >> balanceRows >> balanceCols
-    >> balanceRows >> balanceCols
-    >> balanceRows >> balanceCols
-    >> balanceRows >> balanceCols
-    >> balanceRows >> balanceCols
-    >> balanceRows >> balanceCols
-    >> balanceRows >> balanceCols
-    >> balanceRows >> balanceCols
-    >> balanceRows >> balanceCols
-    >> balanceRows >> balanceCols
-    >> balanceRows >> balanceCols
-    >> balanceRows >> balanceCols
-    >> balanceRows >> balanceCols
-    >> balanceRows >> balanceCols
-    >> balanceRows >> balanceCols
-    >> balanceRows >> balanceCols
-    >> balanceRows >> balanceCols
-    >> balanceRows >> balanceCols
+let balancedRows =
+    rowSums
+    >> List.map2 (-) targetRowSums
+    >> List.map (abs >> (>) 0.005)
+    >> List.reduce (&&)
 
-// let changeMatrix x y newValue matrix =
-//     let matrix = List.mapi (distribute x y newValue) matrix
-//     let badSum = matrixSum matrix
-//     let otherSum = zeroRow y matrix |> matrixSum
-//     let k = List.map3 (fun b s o -> 1. - (b - s) / o) badSum total otherSum
-//     printfn "%i %+A" y k
-//     List.mapi (distributeRows y k) matrix
+let balancedCols =
+    colSums
+    >> List.map2 (-) targetColSums
+    >> List.map (abs >> (>) 0.005)
+    >> List.reduce (&&)
+
+let rec balanceMatrix matrix =
+    match balancedRows matrix, balancedCols matrix with
+    | false, _ -> balanceRows matrix |> balanceMatrix
+    | _, false -> balanceCols matrix |> balanceMatrix
+    | _ -> matrix
+
+let changeMatrix x y newValue = setCell x y newValue >> balanceMatrix
 
 let newMatrix =
     initMatrix
@@ -102,7 +60,7 @@ let newMatrix =
 // VIEW
 
 let cell ``class`` =
-    (*) 100. >> sprintf "%.2f" >> text >> List.singleton
+    (*) 100. >> sprintf "%.0f" >> text >> List.singleton
     >> td [ attr.``class`` ``class`` ]
 
 let sum = List.map2 (+)
