@@ -16,12 +16,15 @@ let replace x y newValue i j value = if i = y && j = x then newValue else value
 let distributeRow x y k i j value = if i = y && j = x then value else value * k
 
 let distribute x y newValue i row =
-    let row = List.mapi (replace x y newValue i) row
+    let newRow = List.mapi (replace x y newValue i) row
     let rowBadSum = List.sum row
     let rowOtherSum = List.mapi (replace x y 0. i) row |> List.sum
     let change = rowBadSum - 1.
     let k = 1. - change / rowOtherSum
-    List.mapi (distributeRow x y k i) row
+    let nr = List.mapi (distributeRow x y k i) newRow
+    // printfn "%i %i %f %i %+A %+A %f %f %f %f %+A"
+        // x y newValue i row newRow rowBadSum rowOtherSum change k nr
+    nr
 
 let zeroRow i = List.mapi (fun j row ->
     if i = j then List.replicate (List.length row) 0. else row
@@ -43,8 +46,12 @@ let changeMatrix x y newValue matrix =
 let newMatrix =
     initMatrix
     |> changeMatrix 0 5 0.
+    |> changeMatrix 0 5 0.
+    |> changeMatrix 1 5 0.
     |> changeMatrix 1 5 0.
     |> changeMatrix 2 3 0.
+    |> changeMatrix 2 3 0.
+    |> changeMatrix 2 5 0.
     |> changeMatrix 2 5 0.
     // |> List.map (fun row -> row, List.item 2 row + List.item 3 row)
     // |> List.sortBy snd
