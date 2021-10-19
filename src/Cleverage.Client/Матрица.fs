@@ -24,20 +24,17 @@ let balanceCols matrix =
     let kc = colSums matrix |> List.map2 (/) targetColSums
     List.map (List.map2 (*) kc) matrix
 
-let balancedRows =
-    rowSums
-    >> List.map2 (-) targetRowSums
+let isBalanced sums targetSums =
+    sums
+    >> List.map2 (-) targetSums
     >> List.map (abs >> (>) 0.005)
     >> List.reduce (&&)
 
-let balancedCols =
-    colSums
-    >> List.map2 (-) targetColSums
-    >> List.map (abs >> (>) 0.005)
-    >> List.reduce (&&)
+let areRowsBalanced = isBalanced rowSums targetRowSums
+let areColsBalanced = isBalanced colSums targetColSums
 
 let rec balanceMatrix matrix =
-    match balancedRows matrix, balancedCols matrix with
+    match areRowsBalanced matrix, areColsBalanced matrix with
     | false, _ -> balanceRows matrix |> balanceMatrix
     | _, false -> balanceCols matrix |> balanceMatrix
     | _ -> matrix
