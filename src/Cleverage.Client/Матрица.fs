@@ -10,9 +10,11 @@ let colSums = List.fold (List.map2 (+)) zeroes
 let targetColSums = colSums initMatrix
 
 let setCell x y newValue =
-    List.mapi (fun j -> List.mapi (fun i value ->
-        if i = x && j = y then newValue else value
-    ))
+    List.mapi (fun i row ->
+        if i = y then
+            List.mapi (fun i value -> if i = x then newValue else value) row
+        else row
+    )
 
 let balanceRows matrix =
     let kr = rowSums matrix |> List.map2 (/) targetRowSums
