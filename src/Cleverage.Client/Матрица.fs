@@ -9,10 +9,10 @@ let zeroes = List.replicate (List.head initMatrix |> List.length) 0.
 let colSums = List.fold (List.map2 (+)) zeroes
 let targetColSums = colSums initMatrix
 
-let setCell x y newValue =
+let setCell x y change =
     List.mapi (fun i row ->
         if i = y then
-            List.mapi (fun i value -> if i = x then newValue else value) row
+            List.mapi (fun i value -> if i = x then change value else value) row
         else row
     )
 
@@ -39,14 +39,16 @@ let rec balanceMatrix matrix =
     | _, false -> balanceCols matrix |> balanceMatrix
     | _ -> matrix
 
-let changeMatrix x y newValue = setCell x y newValue >> balanceMatrix
+let changeMatrix x y change = setCell x y change >> balanceMatrix
+
+let zero _ = 0.
 
 let newMatrix =
     initMatrix
-    |> changeMatrix 0 5 0.
-    |> changeMatrix 1 5 0.
-    |> changeMatrix 2 3 0.
-    |> changeMatrix 2 5 0.
+    |> changeMatrix 0 5 zero
+    |> changeMatrix 1 5 zero
+    |> changeMatrix 2 3 zero
+    |> changeMatrix 2 5 zero
     // |> List.map (fun row -> row, List.item 2 row + List.item 3 row)
     // |> List.sortBy snd
     // |> List.map fst
