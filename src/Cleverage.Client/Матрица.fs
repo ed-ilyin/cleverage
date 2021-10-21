@@ -74,4 +74,4 @@ let matrixTable matrix =
         |> tfoot []
     ]
 
-let view = matrixTable newMatrix
+let view () = matrixTable newMatrix

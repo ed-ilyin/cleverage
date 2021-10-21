@@ -4,6 +4,7 @@
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Probability.fs" />
     <Compile Include="Матрица.fs" />
     <Compile Include="Table.fs" />
     <Compile Include="Main.fs" />
