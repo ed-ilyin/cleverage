@@ -27,10 +27,12 @@ let roleMapping (index, name) =
         | i when i < 9 -> Reptiloid
         | _ -> Demon
 
-let assignRolesAsAvatar table =
-    table
-    |> List.map (fun player -> player, rnd.Next())
-    |> List.sortBy snd |> List.map fst |> List.indexed |> List.map roleMapping
+let assignRolesAsAvatar =
+    List.map (fun player -> player, rnd.Next())
+    >> List.sortBy snd
+    >> List.map fst
+    >> List.indexed
+    >> List.map roleMapping
 
 let countVote table stat player role =
     let vote = Map.remove player table |> Map.toList |> List.item (rnd.Next 9)
@@ -40,11 +42,10 @@ let countVote table stat player role =
 let bench votes =
     let mx = List.maxBy snd votes |> snd |> float
     let maxHalfMinus1 = mx / 2. + 1.
-    votes |> List.filter (snd >> float >> (<=) maxHalfMinus1)
+    List.filter (snd >> float >> (<=) maxHalfMinus1) votes
 
 let voting playersMap =
-    Map.fold (countVote playersMap) Map.empty playersMap
-    |> Map.toList
+    Map.fold (countVote playersMap) Map.empty playersMap |> Map.toList
 
 let numberOfBadRoles bad = function
     | Savior | Mason -> bad
@@ -59,18 +60,17 @@ let run () =
 
 let addToStats stats badOfVoted =
     Map.add badOfVoted
-        <| match Map.tryFind badOfVoted stats with None -> 1 | Some v -> v + 1
-        <| stats
+    <| match Map.tryFind badOfVoted stats with None -> 1 | Some v -> v + 1
+    <| stats
 
 let stats times =
     let stats =
-        List.init times ignore |> List.fold (fun stats _ ->
-            run () |> addToStats stats
-        ) Map.empty
+        List.init times ignore
+        |> List.fold (fun stats _ -> run () |> addToStats stats) Map.empty
         |> Map.toList
         |> List.filter (fun ((_, total), _) -> total = 3)
     let k = List.sumBy snd stats |> float |> (/) 100.
-    List.map (fun (o, v) -> o, float v |> (*) k) stats
+    List.map (fun (o, v) -> o, float v * k) stats
 
 // VIEW
 
