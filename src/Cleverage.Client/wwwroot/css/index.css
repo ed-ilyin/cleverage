@@ -38,3 +38,14 @@ body {
   margin-right: auto;
   margin-bottom: 5px;
 }
+
+.symbol {
+    font-size: 2rem;
+    min-width: 56px;
+    text-align: center;
+}
+
+.column {
+    padding-top: 0.25rem;
+    padding-bottom: 0rem;
+}
