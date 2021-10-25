@@ -28,7 +28,7 @@ let roleMapping (index, name) =
         | _ -> Demon
 
 let assignRolesAsAvatar =
-    List.map (fun player -> player, rnd.Next())
+    List.map <| fun player -> player, rnd.Next()
     >> List.sortBy snd
     >> List.map fst
     >> List.indexed
@@ -47,9 +47,8 @@ let bench votes =
 let voting playersMap =
     Map.fold (countVote playersMap) Map.empty playersMap |> Map.toList
 
-let numberOfBadRoles bad = function
-    | Savior | Mason -> bad
-    | Reptiloid | Demon -> bad + 1
+let numberOfBadRoles bad =
+    function Savior | Mason -> bad | Reptiloid | Demon -> bad + 1
 
 let run () =
     let playersWithRoles = assignRolesAsAvatar players |> Map.ofList
