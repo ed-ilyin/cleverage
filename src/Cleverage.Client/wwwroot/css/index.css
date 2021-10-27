@@ -42,3 +42,7 @@ body {
 .symbol {
     min-width: 56px;
 }
+
+.role {
+    min-width: 62px;
+}
