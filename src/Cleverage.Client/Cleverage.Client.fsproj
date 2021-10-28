@@ -4,6 +4,8 @@
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Types.fs" />
+    <Compile Include="Игра.fs" />
     <Compile Include="Probability.fs" />
     <Compile Include="Матрица.fs" />
     <Compile Include="Table.fs" />

@@ -1,31 +1,17 @@
 module Cleverage.Client.Probability
 open Bolero.Html
 open System
+open Types
 
-type Role = Savior | Mason | Reptiloid | Demon
-type Name = string
 let rnd = Random ()
-
-let players = [
-    "🍑Забава"
-    "🤬Щегол"
-    "👣Маркиза"
-    "🔱Карабас"
-    "🪵Гуманоид"
-    "🦖Буратино"
-    "🌈Хитрость Ума"
-    "🎃Аватар"
-    "♟Жмых"
-    "🍌Командор"
-]
 
 let roleMapping (index, name) =
     name
     , match index with
-        | i when i < 1  -> Savior
-        | i when i < 7 -> Mason
-        | i when i < 9 -> Reptiloid
-        | _ -> Demon
+        | i when i < 1  -> Спаситель
+        | i when i < 7 -> Масон
+        | i when i < 9 -> Рептилоид
+        | _ -> Демон
 
 let assignRolesAsAvatar =
     List.map <| fun player -> player, rnd.Next()
@@ -48,10 +34,12 @@ let voting playersMap =
     Map.fold (countVote playersMap) Map.empty playersMap |> Map.toList
 
 let numberOfBadRoles bad =
-    function Savior | Mason -> bad | Reptiloid | Demon -> bad + 1
+    function Спаситель | Масон -> bad | Рептилоид | Демон -> bad + 1
+
+let игроки = List.map fst Игра.игроки
 
 let run () =
-    let playersWithRoles = assignRolesAsAvatar players |> Map.ofList
+    let playersWithRoles = assignRolesAsAvatar игроки |> Map.ofList
     let roles = voting playersWithRoles |> bench |> List.map (fst >> snd)
     let total = List.length roles
     let bad = List.fold numberOfBadRoles 0 roles
@@ -78,7 +66,7 @@ let list list =
     |> span [ attr.``class`` "column" ]
 
 let view () =
-    let playersWithRoles = assignRolesAsAvatar players
+    let playersWithRoles = assignRolesAsAvatar игроки
     let roles = Map.ofList playersWithRoles |> voting
     span [ attr.``class`` "columns" ] [
         list roles

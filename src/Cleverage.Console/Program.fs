@@ -1,23 +1,6 @@
 module Cleverage.Console.Program
 open System
 
-type Role = Savior | Mason | Reptiloid | Demon
-
-let rnd = Random ()
-
-let players = [
-    "🍑Забава"
-    "🤬Щегол"
-    "👣Маркиза"
-    "🔱Карабас"
-    "🪵Гуманоид"
-    "🦖Буратино"
-    "🌈Хитрость Ума"
-    "🎃Аватар"
-    "♟Жмых"
-    "🍌Командор"
-]
-
 let times = 1
 
 // let roleMapping (index, (name, savior, reptiloid, demon)) =
