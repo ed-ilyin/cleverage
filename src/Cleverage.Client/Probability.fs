@@ -55,7 +55,7 @@ let stats times =
         List.init times ignore
         |> List.fold (fun stats _ -> run () |> addToStats stats) Map.empty
         |> Map.toList
-        |> List.filter (fun ((_, total), _) -> total = 2)
+        |> List.filter (fun ((_, total), _) -> total = 1)
     let k = List.sumBy snd stats |> float |> (/) 100.
     List.map (fun (o, v) -> o, float v * k) stats
 
