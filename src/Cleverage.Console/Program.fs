@@ -28,7 +28,7 @@ let times = 1
 
 [<EntryPoint>]
 let main argv =
-    Cleverage.Client.Probability.stats 1000000 |> printfn "%+A"
+    Cleverage.Client.Probability.stats 100000 |> printfn "%+A"
     // List.init times ignore |> List.fold (fun stats _ ->
     //     assignRolesAsAvatar players |> addToStats stats
     // ) Map.empty |> Map.toList |> List.sortBy fst |> printfn "%A"
