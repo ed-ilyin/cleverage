@@ -27,7 +27,7 @@ let balanceCols matrix =
 let isBalanced sums targetSums =
     sums
     >> List.map2 (-) targetSums
-    >> List.map (abs >> (>) 0.005)
+    >> List.map (abs >> (>) 0.001)
     >> List.reduce (&&)
 
 let areRowsBalanced = isBalanced rowSums targetRowSums

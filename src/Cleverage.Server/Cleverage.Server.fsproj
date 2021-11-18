@@ -1,17 +1,24 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk.Web">
+
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>ALSO.AI.DocumentTranslator.Server-CD76BF63-888B-401B-ADE6-0A39E006464C</UserSecretsId>
   </PropertyGroup>
+
   <ItemGroup>
     <Compile Include="BookService.fs" />
     <Compile Include="Index.fs" />
     <Compile Include="Startup.fs" />
   </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\Cleverage.Client\Cleverage.Client.fsproj" />
-    <PackageReference Include="Bolero.Server" Version="0.*" />
-    <PackageReference Include="Bolero.HotReload.Server" Version="0.*" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="5.0.*" />
+    <PackageReference Include="Bolero.Server" Version="0.17.25" />
+    <PackageReference Include="Bolero.HotReload.Server" Version="0.17.9" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="6.0.0" />
   </ItemGroup>
+
 </Project>
