@@ -1,37 +1,3 @@
-Skip to content
-Search or jump to…
-Pull requests
-Issues
-Marketplace
-Explore
-
-@ed-ilyin
-dotnet
-/
-interactive
-Public
-50
-1.5k
-223
-Code
-Issues
-284
-Pull requests
-7
-Discussions
-Projects
-Wiki
-Security
-Insights
-interactive/Dockerfile
-@brettfo
-brettfo use stable 6.0.100 sdk
-Latest commit 13ba052 10 days ago
- History
- 5 contributors
-@colombod@brettfo@jonsequitur@TIHan@TylerLeonhardt
-97 lines (79 sloc)  3.55 KB
-
 FROM jupyter/base-notebook:latest
 
 # Install .NET CLI dependencies
@@ -129,16 +95,3 @@ ENV DOTNET_INTERACTIVE_CLI_TELEMETRY_OPTOUT=false
 
 # Set root to Notebooks
 WORKDIR ${HOME}/Notebooks/
-© 2021 GitHub, Inc.
-Terms
-Privacy
-Security
-Status
-Docs
-Contact GitHub
-Pricing
-API
-Training
-Blog
-About
-Loading complete
