@@ -12,7 +12,7 @@
         .withAutomaticReconnect()
         .configureLogging(signalR.LogLevel.Information)
         .build();
-      connection.on('newMessage', (message) => {
+      connection.on('NewMessage', (message) => {
         document.getElementById("messages").innerHTML = message;
       });
 

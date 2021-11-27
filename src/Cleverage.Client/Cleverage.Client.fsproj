@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="Eye.fs" />
     <Compile Include="Types.fs" />
     <Compile Include="Игра.fs" />
     <Compile Include="Probability.fs" />

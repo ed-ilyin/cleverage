@@ -7,6 +7,8 @@ open Bolero.Html
 open Bolero.Remoting
 open Bolero.Remoting.Client
 open Bolero.Templating.Client
+open Microsoft.AspNetCore.Components
+open Microsoft.Extensions.Logging
 
 /// Routing endpoints definition.
 type Page =
@@ -16,11 +18,11 @@ type Page =
     | [<EndPoint "/table">] Table
     | [<EndPoint "/matrix">] Matrix
     | [<EndPoint "/probability">] Probability
+    | [<EndPoint "/eye">] Eye
 
 /// The Elmish application's model.
 type Model =
-    {
-        page: Page
+    {   page: Page
         counter: int
         books: Book[] option
         error: string option
@@ -28,6 +30,7 @@ type Model =
         password: string
         signedInAs: option<string>
         signInFailed: bool
+        eye: Eye.Model
     }
 
 and Book =
@@ -39,8 +42,7 @@ and Book =
     }
 
 let initModel =
-    {
-        page = Home
+    {   page = Home
         counter = 0
         books = None
         error = None
@@ -48,6 +50,7 @@ let initModel =
         password = ""
         signedInAs = None
         signInFailed = false
+        eye = Eye.init
     }
 
 /// Remote service definition.
@@ -93,6 +96,7 @@ type Message =
     | RecvSignOut
     | Error of exn
     | ClearError
+    | EyeMsg of Eye.Message
 
 let update remote message model =
     let onSignIn = function
@@ -138,6 +142,7 @@ let update remote message model =
         { model with error = Some exn.Message }, Cmd.none
     | ClearError ->
         { model with error = None }, Cmd.none
+    | EyeMsg msg -> { model with eye = Eye.update msg model.eye }, Cmd.none
 
 /// Connects the routing system to the Elmish application.
 let router = Router.infer SetPage (fun model -> model.page)
@@ -204,6 +209,7 @@ let view model dispatch =
             menuItem model Table "Table"
             menuItem model Matrix "Матрица"
             menuItem model Probability "Вероятность"
+            menuItem model Eye "Всевидящее Око"
         ])
         .Body(
             cond model.page <| function
@@ -216,6 +222,7 @@ let view model dispatch =
             | Table -> Table.view ()
             | Matrix -> Matrix.view ()
             | Probability -> Probability.view ()
+            | Eye -> Eye.view model.eye
         )
         .Error(
             cond model.error <| function
@@ -234,7 +241,11 @@ type MyApp() =
     override this.Program =
         let bookService = this.Remote<BookService>()
         let update = update bookService
-        Program.mkProgram (fun _ -> initModel, Cmd.ofMsg GetSignedInAs) update view
+        Program.mkProgram (fun _ -> initModel, Cmd.ofMsg GetSignedInAs) update
+            view
+        |> Program.withSubscription (fun model ->
+            Eye.subscription model.eye |> Cmd.map EyeMsg
+        )
         |> Program.withRouter router
 #if DEBUG
         |> Program.withHotReload

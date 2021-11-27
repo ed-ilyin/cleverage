@@ -1,4 +1,4 @@
-module EdIlyin.Cleverage.Streaming
+module Cleverage.Streaming
 open System
 open System.IO
 open System.Net.Http
@@ -37,6 +37,6 @@ let Broadcast
     log.LogInformation $"😈: {content}"
     return!
         signalRMessages.AddAsync (
-            SignalRMessage (Target = "newMessage", Arguments = [| content |])
+            SignalRMessage (Target = "NewMessage", Arguments = [| content |])
         )
 }
