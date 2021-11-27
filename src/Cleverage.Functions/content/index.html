@@ -1,14 +1,15 @@
 <html>
-
+<head><title>CLeveRAge</title></head>
 <body>
   <h1>CLeveRAge</h1>
   <div id="messages"></div>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/3.1.7/signalr.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.0/signalr.min.js" integrity="sha512-2kq/RiHEhMKQN7FOPzMjmOxTlnNknhIgG9e1bbh/XzXi8+3TArxtNzg4xfmnRyQNPpLxibguHw3B1abasiscaw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script>
     let messages = document.querySelector('#messages');
     const apiBaseUrl = window.location.origin;
     const connection = new signalR.HubConnectionBuilder()
         .withUrl(apiBaseUrl + '/api')
+        .withAutomaticReconnect()
         .configureLogging(signalR.LogLevel.Information)
         .build();
       connection.on('newMessage', (message) => {
