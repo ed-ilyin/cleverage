@@ -24,8 +24,13 @@ let balanceCols matrix =
     let kc = colSums matrix |> List.map2 (/) targetColSums
     List.map (List.map2 (*) kc) matrix
 
+let log tag x =
+    printfn "%s: %+A" tag x
+    x
+
 let isBalanced sums targetSums =
     sums
+    // >> log "sums"
     >> List.map2 (-) targetSums
     >> List.map (abs >> (>) 0.001)
     >> List.reduce (&&)

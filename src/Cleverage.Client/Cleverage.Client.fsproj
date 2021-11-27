@@ -22,6 +22,7 @@
     <PackageReference Include="Bolero.Build" Version="0.17.25" />
     <PackageReference Include="Bolero.HotReload" Version="0.17.9" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="6.0.0" />
     <PackageReference Include="System.Net.Http.Json" Version="6.0.0" />
   </ItemGroup>
 
