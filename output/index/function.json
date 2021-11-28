@@ -1,0 +1,14 @@
+{
+  "generatedBy": "Microsoft.NET.Sdk.Functions.Generator-4.0.1",
+  "configurationSource": "attributes",
+  "bindings": [
+    {
+      "type": "httpTrigger",
+      "authLevel": "function",
+      "name": "req"
+    }
+  ],
+  "disabled": false,
+  "scriptFile": "../bin/Cleverage.dll",
+  "entryPoint": "Cleverage.Streaming.Index"
+}
