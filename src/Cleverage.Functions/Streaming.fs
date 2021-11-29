@@ -10,6 +10,19 @@ open Microsoft.Azure.WebJobs.Extensions.Http
 open Microsoft.Azure.WebJobs.Extensions.SignalRService
 open Newtonsoft.Json
 open Microsoft.Extensions.Logging
+open Thoth.Json.Net
+
+type Message =
+    { From: string
+      Chat: string option
+      Text: string }
+    static member Decoder : Decoder<Message> =
+        Decode.object (fun get -> {
+            From = get.Required.At [ "from"; "first_name" ] Decode.string
+            Chat = get.Optional.At [ "chat"; "title" ] Decode.string
+            Text = get.Required.Field "text" Decode.string
+        })
+        |> Decode.field "message"
 
 let private httpClient = new HttpClient()
 
@@ -26,17 +39,23 @@ let Negotiate
     ([<SignalRConnectionInfo(HubName = "CLeveRAge")>]
         connectionInfo: SignalRConnectionInfo) = connectionInfo
 
+let ofReq decoder (req: HttpRequest) = task {
+    use reader = new StreamReader(req.Body)
+    let! body = reader.ReadToEndAsync()
+    return Decode.fromString decoder body
+}
+
 [<FunctionName("broadcast")>]
 let Broadcast
-    ([<HttpTrigger(AuthorizationLevel.Function)>] req: HttpRequestMessage)
+    ([<HttpTrigger(AuthorizationLevel.Function)>] req: HttpRequest)
     ([<SignalR(HubName = "CLeveRAge")>]
         signalRMessages: IAsyncCollector<SignalRMessage>)
     (log: ILogger) = task {
-
-    let! content = req.Content.ReadAsStringAsync ()
-    log.LogInformation $"😈: {content}"
+    let! message = ofReq Message.Decoder req
+    let s = sprintf "%+A" message
+    log.LogInformation s
     return!
         signalRMessages.AddAsync (
-            SignalRMessage (Target = "NewMessage", Arguments = [| content |])
+            SignalRMessage (Target = "NewMessage", Arguments = [| s |])
         )
 }
