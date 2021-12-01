@@ -3,13 +3,15 @@ open Microsoft.AspNetCore.SignalR.Client
 open Elmish
 open System.Threading.Tasks
 open Bolero.Html
+open Cleverage
 
-type Model = string list
-type Message = AddMessage of string
+
+type Message = AddMessage of item: Shared.Item
+type Model = Shared.Item list
 
 let init = []
 
-let update message model =
+let update message (model: Model) =
     match message with
     | AddMessage msg -> msg :: model
 
@@ -26,9 +28,25 @@ let sub (dispatch: _ -> unit) =
             .WithAutomaticReconnect()
             .Build()
 
-    hubConnection.On<string> ("NewMessage", AddMessage >> dispatch) |> ignore
+    hubConnection.On<Shared.Item> (
+        "NewMessage",
+        log "m" >> AddMessage >> dispatch)
+    |> log "on"
+    |> ignore
+
     hubConnection.StartAsync () |> start
 
 let subscription model = Cmd.ofSub sub
 
-let view model = List.map (text >> List.singleton >> li []) model |> ol []
+// VIEW
+
+let d c = div [ attr.``class`` c ]
+
+let item (i, json) =
+    li [ attr.title json ] [
+        match i with
+        | Error e -> d "is-danger" [ text e ]
+        | Ok (m: Shared.Message) -> sprintf "%+A" i |> text
+    ]
+
+let view (model: Model) = List.map item model |> ol []
