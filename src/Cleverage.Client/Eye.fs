@@ -4,7 +4,8 @@ open Elmish
 open System.Threading.Tasks
 open Bolero.Html
 open Cleverage
-
+open Microsoft.Extensions.Logging
+open Thoth.Json.Net
 
 type Message = AddMessage of item: Shared.Item
 type Model = Shared.Item list
@@ -21,22 +22,38 @@ let log tag a =
 
 let start (task: Task) = task.Start ()
 
-let sub (dispatch: _ -> unit) =
+let resultJoin result =
+    match result with
+    Ok (Ok a) -> Ok a | Ok (Error e) -> Error e | Error e -> Error e
+
+let decode dispatch json =
+    match Decode.Auto.fromString<Shared.Item> json with
+    | Ok (Ok r, tele) -> Ok r, tele
+    | Ok (Error e, tele) -> Error e, tele
+    | Error e -> Error e
+
+    >> log "m"
+    >> resultJoin
+    >> AddMessage
+    >> dispatch
+
+let sub (loggerProvider: ILoggerProvider) (dispatch: _ -> unit) =
     let hubConnection =
         HubConnectionBuilder()
             .WithUrl("https://cleverage-api.azurewebsites.net/api")
             .WithAutomaticReconnect()
+            .ConfigureLogging(fun logging ->
+                logging.AddProvider(loggerProvider) |> ignore
+            )
             .Build()
 
-    hubConnection.On<Shared.Item> (
-        "NewMessage",
-        log "m" >> AddMessage >> dispatch)
-    |> log "on"
+    hubConnection.On<string,string> ("NewMessage",
+    )
     |> ignore
 
     hubConnection.StartAsync () |> start
 
-let subscription model = Cmd.ofSub sub
+let subscription loggerProvider model = Cmd.ofSub <| sub loggerProvider
 
 // VIEW
 

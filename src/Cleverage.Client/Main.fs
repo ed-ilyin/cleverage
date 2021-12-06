@@ -238,13 +238,17 @@ let view model dispatch =
 type MyApp() =
     inherit ProgramComponent<Model, Message>()
 
+    [<Inject>]
+    member val LoggerProvider =
+        Unchecked.defaultof<ILoggerProvider> with get, set
+
     override this.Program =
         let bookService = this.Remote<BookService>()
         let update = update bookService
         Program.mkProgram (fun _ -> initModel, Cmd.ofMsg GetSignedInAs) update
             view
         |> Program.withSubscription (fun model ->
-            Eye.subscription model.eye |> Cmd.map EyeMsg
+            Eye.subscription this.LoggerProvider model.eye |> Cmd.map EyeMsg
         )
         |> Program.withRouter router
 #if DEBUG

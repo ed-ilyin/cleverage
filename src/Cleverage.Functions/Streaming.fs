@@ -33,40 +33,64 @@ let ofReq decoder (req: HttpRequest) = async {
     return Decode.fromString decoder body, body
 }
 
-let actionResultTaskOfAsync (log: ILogger) (task: Async<Result<_,string>>) =
+let actionResultTaskOfAsync (log: ILogger) computation =
     async {
-    let! catch = Async.Catch task
+    let! catch = Async.Catch computation
     return
         match catch with
-        | Choice1Of2 (Ok ok) ->
+        | Choice1Of2 ok ->
             log.LogInformation ("📤👌🏼{ok}", sprintf "%+A" ok)
             OkObjectResult ok :> IActionResult
-        | Choice1Of2 (Error error) ->
-            log.LogError ("📤💩{error}", error)
-            BadRequestObjectResult error
         | Choice2Of2 error ->
             log.LogError ("📤💩{error}", error)
             BadRequestObjectResult error.Message
     } |> Async.StartAsTask
 
+let asyncResult computation = async {
+    let! catch = Async.Catch computation
+    return
+        match catch with
+        Choice1Of2 ok -> Ok ok | Choice2Of2 error -> Result.Error error
+}
+
+let encode a = Encode.Auto.toString (4, a)
+
+let cleverage (req: HttpRequestMessage) (log: ILogger) func =
+    async {
+        let! json = req.Content.ReadAsStringAsync () |> Async.AwaitTask
+        log.LogInformation ("📥{json}", json)
+
+        let! result =
+            async {
+                let cleverage = Decode.fromString Message.Decoder json
+                log.LogInformation ("👓{cleverage}", cleverage)
+                return! func cleverage json
+            }
+            |> asyncResult
+
+        match result with
+        | Ok ok ->
+            log.LogInformation ("⚡👌🏼{ok}", sprintf "%+A" ok)
+        | Error error ->
+            log.LogError ("⚡💩{error}", error)
+
+        return result, json
+    }
+    |> actionResultTaskOfAsync log
+
 [<FunctionName("broadcast")>]
 let Broadcast
-    ([<HttpTrigger(AuthorizationLevel.Function)>] req: HttpRequest)
+    ([<HttpTrigger(AuthorizationLevel.Function)>] req: HttpRequestMessage)
     ([<SignalR(HubName = "CLeveRAge")>]
         signalRMessages: IAsyncCollector<SignalRMessage>)
-    (log: ILogger) =
-    async {
-        let! result, request = ofReq Message.Decoder req
-        log.LogInformation ("📥{request}", request)
-
-        let! signal =
-            signalRMessages.AddAsync
+    (log: ILogger) = cleverage req log <| fun decodeResult json -> async {
+        do! signalRMessages.AddAsync
                 (SignalRMessage (
                     Target = "NewMessage",
-                    Arguments = [| result, request |]
+                    Arguments =
+                        [| Encode.Auto.toString (4, decodeResult), json |]
                 ))
             |> Async.AwaitTask
 
-        return Ok (result, request)
+        return Ok decodeResult
     }
-    |> actionResultTaskOfAsync log
