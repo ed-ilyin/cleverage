@@ -81,5 +81,5 @@ let Broadcast
                     Arguments = [| Encode.Auto.toString (4, decodeResult) |]
                 ))
             |> Async.AwaitTask
-        return Ok decodeResult
+        return Result.map fst decodeResult |> Ok
     }
