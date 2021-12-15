@@ -61,7 +61,7 @@ let cleverage (req: HttpRequestMessage) (log: ILogger) func =
     actionResultTaskOfAsyncResult log <| async {
         let! json = req.Content.ReadAsStringAsync () |> Async.AwaitTask
         log.LogInformation ("📥{json}", json)
-        let cleverage = Decode.fromString Message.Decoder json
+        let cleverage = Decode.fromString Update.Decoder json
         log.LogInformation ("👓{cleverage}", cleverage)
         return! func cleverage json
     }
@@ -76,8 +76,8 @@ let Broadcast
                 (SignalRMessage (
                     Target = "NewMessage",
                     Arguments =
-                        [| Encode.Auto.toString (4, decodeResult), json |]
+                        [| Encode.Auto.toString (4, (decodeResult, json)) |]
                 ))
             |> Async.AwaitTask
-        return Result.map fst decodeResult |> Ok
+        return Ok decodeResult
     }
