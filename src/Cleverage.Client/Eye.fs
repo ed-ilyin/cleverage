@@ -67,8 +67,16 @@ let subscription loggerProvider model = Cmd.ofSub <| sub loggerProvider
 
 let d c = div [ attr.``class`` c ]
 
-let chat name messages =
-    li [] [ textf "%+A: %+A" name messages]
+let message _ (message: Result<Update, string>, json: string) =
+    li [ attr.title json ] [
+        textf "%+A" message
+    ]
+
+let room name (room: Room) =
+    li [] [
+        textf "%+A" name
+        Map.map message room |> Map.toList |> List.map snd |> ol []
+    ]
     // match result with
     // | Ok (u: Update) -> sprintf "%+A" i |> text
     // | Error e -> d "is-danger" [ text e ]
@@ -76,4 +84,4 @@ let chat name messages =
     // ]
 
 let view (model: Model) =
-    Map.map chat model |> Map.toList |> List.map snd |> ol []
+    model |> Map.map room |> Map.toList |> List.map snd |> ol []
