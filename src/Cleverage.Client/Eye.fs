@@ -3,19 +3,31 @@ open Microsoft.AspNetCore.SignalR.Client
 open Elmish
 open System.Threading.Tasks
 open Bolero.Html
-open Cleverage
+open Cleverage.Shared
 open Microsoft.Extensions.Logging
 open Thoth.Json.Net
 open Cleverage.Helpers
 
-type Message = AddMessage of item: Result<Message * string, string>
-type Model = Result<Message * string, string> list
+type Message = Update of update: Result<Update, string> * json: string
+type Room = Map<uint64, Result<Update, string> * string>
+type Model = Map<string option, Room>
 
-let init = []
+let init : Model = Map.ofList []
 
-let update message (model: Model) =
+let update message (model: Model) : Model =
     match message with
-    | AddMessage msg -> msg :: model
+    | Update (Ok update, json) ->
+        match Map.tryFind update.Chat model with
+        | Some (room: Room) -> room | None ->  Map.empty
+        |> Map.add update.MessageId (Ok update, json)
+        |> Map.add update.Chat
+        <| model
+    | Update (Error error, json) ->
+        match Map.tryFind None model with
+        | Some (room: Room) -> room | None ->  Map.empty
+        |> Map.add 0UL (Error error, json)
+        |> Map.add None
+        <| model
 
 let log tag a =
     printfn "%s: %+A" tag a
@@ -24,10 +36,11 @@ let log tag a =
 let start (task: Task) = task.Start ()
 
 let decode dispatch json =
-    Decode.Auto.fromString<Result<Message * string, string>> json
-    |> Result.join
-    |> log "m"
-    |> AddMessage
+    match Decode.Auto.fromString<Result<Update, string> * string> json with
+    | Ok (Ok update, json) -> Ok update, json
+    | Ok (Error error, json) -> Error error, json
+    | Error error -> Error json, ""
+    |> Update
     |> dispatch
 
 let sub (loggerProvider: ILoggerProvider) (dispatch: _ -> unit) =
@@ -51,11 +64,13 @@ let subscription loggerProvider model = Cmd.ofSub <| sub loggerProvider
 
 let d c = div [ attr.``class`` c ]
 
-let item result =
-    li [ attr.title result ] [
-        match i with
-        | Error e -> d "is-danger" [ text e ]
-        | Ok (m: Shared.Message) -> sprintf "%+A" i |> text
-    ]
+let chat name messages =
+    li [] [ textf "%+A: %+A" name messages]
+    // match result with
+    // | Ok (u: Update) -> sprintf "%+A" i |> text
+    // | Error e -> d "is-danger" [ text e ]
+    // li [ attr.title result ] [
+    // ]
 
-let view (model: Model) = List.map item model |> ol []
+let view (model: Model) =
+    Map.map chat model |> Map.toList |> List.map snd |> ol []
