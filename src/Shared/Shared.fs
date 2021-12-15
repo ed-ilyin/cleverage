@@ -16,6 +16,8 @@ type Update =
 
             Chat =
                 get.Optional.At [ "chat"; "title" ] Decode.string
+                |> Option.orElse
+                <| get.Optional.At [ "chat"; "first_name" ] Decode.string
                 |> Option.defaultValue ""
 
             Text =
