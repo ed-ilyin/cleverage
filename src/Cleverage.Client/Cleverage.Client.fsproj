@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="Helpers.fs" />
     <Compile Include="Eye.fs" />
     <Compile Include="Types.fs" />
     <Compile Include="Игра.fs" />

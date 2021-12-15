@@ -59,14 +59,11 @@ let encode a = Encode.Auto.toString (4, a)
 
 let cleverage (req: HttpRequestMessage) (log: ILogger) func =
     actionResultTaskOfAsyncResult log <| async {
-        let! result = asyncResult <| async {
-            let! json = req.Content.ReadAsStringAsync () |> Async.AwaitTask
-            log.LogInformation ("📥{json}", json)
-            let cleverage = Decode.unsafeFromString Message.Decoder json
-            log.LogInformation ("👓{cleverage}", cleverage)
-            return cleverage, json
-        }
-        return! func result
+        let! json = req.Content.ReadAsStringAsync () |> Async.AwaitTask
+        log.LogInformation ("📥{json}", json)
+        let cleverage = Decode.fromString Message.Decoder json
+        log.LogInformation ("👓{cleverage}", cleverage)
+        return! func cleverage json
     }
 
 [<FunctionName("broadcast")>]
@@ -74,11 +71,12 @@ let Broadcast
     ([<HttpTrigger(AuthorizationLevel.Function)>] req: HttpRequestMessage)
     ([<SignalR(HubName = "CLeveRAge")>]
         signalRMessages: IAsyncCollector<SignalRMessage>)
-    (log: ILogger) = cleverage req log <| fun decodeResult -> async {
+    (log: ILogger) = cleverage req log <| fun decodeResult json -> async {
         do! signalRMessages.AddAsync
                 (SignalRMessage (
                     Target = "NewMessage",
-                    Arguments = [| Encode.Auto.toString (4, decodeResult) |]
+                    Arguments =
+                        [| Encode.Auto.toString (4, decodeResult), json |]
                 ))
             |> Async.AwaitTask
         return Result.map fst decodeResult |> Ok

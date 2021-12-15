@@ -12,6 +12,3 @@ type Message =
             Text = get.Optional.Field "text" Decode.string
         })
         |> Decode.field "message"
-
-type Item =
-    Result<Message,string> * string

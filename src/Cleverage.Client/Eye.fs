@@ -6,9 +6,10 @@ open Bolero.Html
 open Cleverage
 open Microsoft.Extensions.Logging
 open Thoth.Json.Net
+open Cleverage.Helpers
 
-type Message = AddMessage of item: Shared.Item
-type Model = Shared.Item list
+type Message = AddMessage of item: Result<Message * string, string>
+type Model = Result<Message * string, string> list
 
 let init = []
 
@@ -22,20 +23,12 @@ let log tag a =
 
 let start (task: Task) = task.Start ()
 
-let resultJoin result =
-    match result with
-    Ok (Ok a) -> Ok a | Ok (Error e) -> Error e | Error e -> Error e
-
 let decode dispatch json =
-    match Decode.Auto.fromString<Shared.Item> json with
-    | Ok (Ok r, tele) -> Ok r, tele
-    | Ok (Error e, tele) -> Error e, tele
-    | Error e -> Error e
-
-    >> log "m"
-    >> resultJoin
-    >> AddMessage
-    >> dispatch
+    Decode.Auto.fromString<Result<Message * string, string>> json
+    |> Result.join
+    |> log "m"
+    |> AddMessage
+    |> dispatch
 
 let sub (loggerProvider: ILoggerProvider) (dispatch: _ -> unit) =
     let hubConnection =
@@ -47,8 +40,7 @@ let sub (loggerProvider: ILoggerProvider) (dispatch: _ -> unit) =
             )
             .Build()
 
-    hubConnection.On<string,string> ("NewMessage",
-    )
+    hubConnection.On<string> ("NewMessage", decode dispatch)
     |> ignore
 
     hubConnection.StartAsync () |> start
@@ -59,8 +51,8 @@ let subscription loggerProvider model = Cmd.ofSub <| sub loggerProvider
 
 let d c = div [ attr.``class`` c ]
 
-let item (i, json) =
-    li [ attr.title json ] [
+let item result =
+    li [ attr.title result ] [
         match i with
         | Error e -> d "is-danger" [ text e ]
         | Ok (m: Shared.Message) -> sprintf "%+A" i |> text
