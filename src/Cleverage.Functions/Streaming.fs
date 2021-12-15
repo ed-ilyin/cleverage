@@ -76,7 +76,13 @@ let Broadcast
                 (SignalRMessage (
                     Target = "NewMessage",
                     Arguments =
-                        [| Encode.Auto.toString (4, (decodeResult, json)) |]
+                        [| Encode.Auto.toString (
+                            4,
+                            (decodeResult, json),
+                            PascalCase,
+                            Extra.withUInt64 Extra.empty
+                        )
+                        |]
                 ))
             |> Async.AwaitTask
         return Ok decodeResult

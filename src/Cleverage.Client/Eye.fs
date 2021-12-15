@@ -36,7 +36,10 @@ let log tag a =
 let start (task: Task) = task.Start ()
 
 let decode dispatch json =
-    match Decode.Auto.fromString<Result<Update, string> * string> json with
+    let decodeResult =
+        Decode.Auto.fromString<Result<Update, string> * string>
+            (json, PascalCase, Extra.withUInt64 Extra.empty)
+    match decodeResult with
     | Ok (Ok update, json) -> Ok update, json
     | Ok (Error error, json) -> Error error, json
     | Error error -> Error json, ""
