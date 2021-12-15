@@ -75,13 +75,13 @@ let message _ (message: Result<Update, string>, json: string) =
     ]
 
 let room name (room: Room) =
-    d "card" [
+    d "column" [ d "card" [
         d "card-header" [ d "card-header-title" [ text name ] ]
         Map.map message room
         |> Map.toList
         |> List.map snd
         |> d "card-content"
-    ]
+    ] ]
     // match result with
     // | Ok (u: Update) -> sprintf "%+A" i |> text
     // | Error e -> d "is-danger" [ text e ]
@@ -89,4 +89,4 @@ let room name (room: Room) =
     // ]
 
 let view (model: Model) =
-    model |> Map.map room |> Map.toList |> List.map snd |> div []
+    model |> Map.map room |> Map.toList |> List.map snd |> d "columns"
