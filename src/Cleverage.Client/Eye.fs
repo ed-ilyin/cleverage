@@ -10,7 +10,7 @@ open Cleverage.Helpers
 
 type Message = Update of update: Result<Update, string> * json: string
 type Room = Map<uint64, Result<Update, string> * string>
-type Model = Map<string option, Room>
+type Model = Map<string, Room>
 
 let init : Model = Map.ofList []
 
@@ -23,10 +23,10 @@ let update message (model: Model) : Model =
         |> Map.add update.Chat
         <| model
     | Update (Error error, json) ->
-        match Map.tryFind None model with
+        match Map.tryFind "" model with
         | Some (room: Room) -> room | None ->  Map.empty
         |> Map.add 0UL (Error error, json)
-        |> Map.add None
+        |> Map.add ""
         <| model
 
 let log tag a =
@@ -68,14 +68,19 @@ let subscription loggerProvider model = Cmd.ofSub <| sub loggerProvider
 let d c = div [ attr.``class`` c ]
 
 let message _ (message: Result<Update, string>, json: string) =
-    li [ attr.title json ] [
-        textf "%+A" message
+    div [ attr.title json ] [
+        match message with
+        | Ok m -> textf "%s: %s" m.From m.Text
+        | Error e -> d "is-danger" [ text e ]
     ]
 
 let room name (room: Room) =
-    li [] [
-        textf "%+A" name
-        Map.map message room |> Map.toList |> List.map snd |> ol []
+    d "card" [
+        d "card-header" [ d "card-header-title" [ text name ] ]
+        Map.map message room
+        |> Map.toList
+        |> List.map snd
+        |> d "card-content"
     ]
     // match result with
     // | Ok (u: Update) -> sprintf "%+A" i |> text
@@ -84,4 +89,4 @@ let room name (room: Room) =
     // ]
 
 let view (model: Model) =
-    model |> Map.map room |> Map.toList |> List.map snd |> ol []
+    model |> Map.map room |> Map.toList |> List.map snd |> div []
