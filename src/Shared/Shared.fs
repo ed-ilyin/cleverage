@@ -11,7 +11,8 @@ type Update =
         let decodeCleverageMessage =
             Decode.object (fun get ->
                 let text =
-                    get.Required.At [ "Event"; "Message"; "Text" ] Decode.string
+                    get.Optional.At [ "Event"; "Message"; "Text" ] Decode.string
+                    |> Option.defaultValue ""
                 {   MessageId = get.Required.Field "MessageID" Decode.uint64
                     From =
                         get.Required.At
