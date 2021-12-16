@@ -18,7 +18,7 @@ let page = doctypeHtml [] [
         nav [attr.classes ["navbar"; "is-dark"]; "role" => "navigation"; attr.aria "label" "main navigation"] [
             div [attr.classes ["navbar-brand"]] [
                 a [attr.classes ["navbar-item"; "has-text-weight-bold"; "is-size-5"]; attr.href "https://fsbolero.io"] [
-                    img [attr.style "height:40px"; attr.src "./data/logo.png"]
+                    img [attr.style "height:40px"; attr.src "https://raw.githubusercontent.com/alex5250/cleverage/master/src/Cleverage.Server/logo.jpg"]
                     text "CLeveRAge | СОобРАЖатор"
                 ]
             ]
