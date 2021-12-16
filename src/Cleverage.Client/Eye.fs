@@ -70,7 +70,11 @@ let d c = div [ attr.``class`` c ]
 let message _ (message: Result<Update, string>, json: string) =
     div [ attr.title json ] [
         match message with
-        | Ok m -> textf "%s: %s" m.From m.Text
+        | Ok m ->
+            d "columns is-mobile" [
+                d "column is-narrow" [ textf "%s ⦿ " m.From ]
+                m.Text |> List.map (fun t -> div [] [ text t ]) |> d "column"
+            ]
         | Error e -> d "is-danger" [ text e ]
     ]
 
