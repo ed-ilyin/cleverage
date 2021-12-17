@@ -70,7 +70,12 @@ let d c = div [ attr.``class`` c ]
 let message _ (message: Result<Update, string>, json: string) =
     div [ attr.title json ] [
         match message with
-        | Ok m -> textf "%s: %s" m.From m.Text
+        | Ok m ->
+            let t = m.Text |> List.map (fun t -> div [] [ text t ]) |> div []
+            if m.From = "" then t else d "columns is-mobile" [
+                d "column is-narrow" [ textf "%s • " m.From ]
+                d "column" [ t ]
+            ]
         | Error e -> d "is-danger" [ text e ]
     ]
 
@@ -82,11 +87,10 @@ let room name (room: Room) =
         |> List.map snd
         |> d "card-content"
     ] ]
-    // match result with
-    // | Ok (u: Update) -> sprintf "%+A" i |> text
-    // | Error e -> d "is-danger" [ text e ]
-    // li [ attr.title result ] [
-    // ]
 
 let view (model: Model) =
-    model |> Map.map room |> Map.toList |> List.map snd |> d "columns"
+    model
+    |> Map.map room
+    |> Map.toList
+    |> List.map snd
+    |> d "columns is-multiline content is-small"
