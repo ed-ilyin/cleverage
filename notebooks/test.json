@@ -1,0 +1,28 @@
+{
+    "SessionName": "Magenta Solution",
+    "Event": {
+        "Message": null,
+        "Video": null,
+        "VideoNote": {
+            "ChatID": 215296975,
+            "ChannelUsername": "",
+            "ReplyToMessageID": 0,
+            "ReplyMarkup": null,
+            "DisableNotification": false,
+            "File": null,
+            "FileID": "DQACAgIAAxkBAAEiTzJhvK2LAAFBO36Hc5O7OiHXFp8vg_gAAjMVAAKpj-lJj-S8EHfK2NEjBA",
+            "UseExisting": true,
+            "MimeType": "",
+            "FileSize": 0,
+            "Duration": 0,
+            "Length": 384
+        },
+        "Stick": null,
+        "Photo": null,
+        "Anim": null,
+        "Audio": null,
+        "Voice": null,
+        "MsgID2Del": null
+    },
+    "MessageID": 2248533
+}

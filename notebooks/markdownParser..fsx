@@ -22,7 +22,7 @@ let bold = mbw "*" |>> Bold
 
 let text =
     notFollowedBy
-    <| choice [ log bold ]
+    <| choice [ bp bold ]
     >>. anyChar
     |> many1Chars
     |>> Entity.Text
@@ -35,15 +35,3 @@ let test p str =
     | Failure(errorMsg, _, _) -> failwith errorMsg
 
 test markdown "*ifjs*disdj"
-let p =
-    pstring "*"
-    |> notFollowedBy
-    >>. anyChar
-    |> many1Chars
-    |>> Entity.Text
-    <|> (pstring "*" |>> Entity.Text)
-    |> many1
-    // |> test
-match run p "aadsvf*daea*aaa" with
-| Success(result, _, p)   -> $"{result} {p}"
-| Failure(errorMsg, _, _) -> failwith errorMsg
