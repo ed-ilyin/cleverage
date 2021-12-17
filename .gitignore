@@ -173,7 +173,11 @@ csx/
 # Microsoft Azure Emulator
 ecf/
 rcf/
-
+# OS generated files #
+######################
+.DS_Store
+.DS_Store?
+\
 # Windows Store app package directories and files
 AppPackages/
 BundleArtifacts/
