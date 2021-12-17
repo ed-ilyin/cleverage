@@ -5,29 +5,43 @@ type Update =
     {   MessageId: uint64
         From: string
         Chat: string
-        Text: string }
+        Text: string list
+    }
     static member Decoder : Decoder<Update> =
-        let decodeMessage = Decode.object (fun get -> {
-                MessageId =
-                    get.Required.Field "message_id" Decode.uint64
-
-                From = get.Required.At [ "from"; "first_name" ] Decode.string
-
-                Chat =
+        let decodeCleverageMessage =
+            Decode.object (fun get ->
+                let text =
+                    get.Optional.At [ "Event"; "Message"; "Text" ] Decode.string
+                    |> Option.defaultValue ""
+                {   MessageId = get.Required.Field "MessageID" Decode.uint64
+                    From =
+                        get.Required.At
+                            [ "Event"; "Message"; "ChannelUsername" ]
+                            Decode.string
+                    Chat = get.Required.Field "SessionName" Decode.string
+                    Text = text.Split '\n' |> List.ofArray
+                }
+            )
+        let decodeTelegramMessage =
+            Decode.field "message"
+            <| Decode.object (fun get ->
+                let from =
+                    get.Required.At [ "from"; "first_name" ] Decode.string
+                let chat =
                     get.Optional.At [ "chat"; "title" ] Decode.string
                     |> Option.orElse
                     <| get.Optional.At [ "chat"; "first_name" ] Decode.string
                     |> Option.defaultValue ""
-
-                Text =
+                let text =
                     get.Optional.Field "text" Decode.string
                     |> Option.defaultValue ""
-
-            })
-        Decode.oneOf [
-            decodeMessage
-            decodeMessage |> Decode.field "message"
-        ]
+                {   MessageId = get.Required.Field "message_id" Decode.uint64
+                    From = if from = chat then "" else from
+                    Chat = chat
+                    Text = text.Split '\n' |> List.ofArray
+                }
+            )
+        Decode.oneOf [ decodeCleverageMessage; decodeTelegramMessage ]
 
     static member Encoder update =
         Encode.Auto.generateEncoderCached<Update>
