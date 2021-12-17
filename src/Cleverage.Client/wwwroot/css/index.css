@@ -46,3 +46,11 @@ body {
 .role {
     min-width: 62px;
 }
+
+.game_icon,.icon_top {
+    -webkit-filter: invert(100%);
+    filter: invert(100%);
+    padding-right: 5px;
+}
+
+
