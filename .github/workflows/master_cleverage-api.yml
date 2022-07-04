@@ -29,7 +29,7 @@ jobs:
         shell: bash
         run: |
           pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
-          dotnet build --configuration Release --output ./output src/Cleverage.Functions
+          dotnet build --configuration Release --output ./output
           popd
 
       - name: 'Run Azure Functions Action'
@@ -39,4 +39,4 @@ jobs:
           app-name: 'CLeveRAge-API'
           slot-name: 'Production'
           package: '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/output'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_E9C1AC2F92004D13ADDD2B575724F467 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_5EF295D4006F497E9C49F3D12A03F7E9 }}
