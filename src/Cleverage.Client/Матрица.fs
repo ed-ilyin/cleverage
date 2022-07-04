@@ -2,7 +2,7 @@ module Cleverage.Client.Matrix
 open Bolero.Html
 open System
 
-let initMatrix = List.replicate 10 [ 0.1; 0.6; 0.2; 0.1 ]
+let initMatrix = List.replicate 10 [ 0.1; 0.5; 0.2; 0.1; 0.1 ]
 let rowSums = List.map List.sum
 let targetRowSums = rowSums initMatrix
 let zeroes = List.replicate (List.head initMatrix |> List.length) 0.
